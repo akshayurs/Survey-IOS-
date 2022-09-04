@@ -1,0 +1,36 @@
+{
+  "expo": {
+    "name": "survey_optimus",
+    "slug": "survey_optimus",
+    "version": "1.0.2",
+    "orientation": "portrait",
+    "icon": "./assets/Star_1024.png",
+    "userInterfaceStyle": "light",
+    "splash": {
+      "image": "./assets/splash_screen_survey_optimus.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#ffffff"
+    },
+    "updates": {
+      "fallbackToCacheTimeout": 0
+    },
+    "assetBundlePatterns": [
+      "**/*"
+    ],
+    "ios": {
+      "supportsTablet": true
+    },
+    "android": {
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/Star_1024.png",
+        "backgroundColor": "#FFFFFF"
+      },
+      "package": "com.survey__optimus.survey__optimus",
+      "versionCode": 2,
+      "permissions": []
+    },
+    "web": {
+      "favicon": "./assets/company_logo.png"
+    }
+  }
+}
