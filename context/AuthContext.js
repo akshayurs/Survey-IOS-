@@ -1,43 +1,43 @@
-import AsyncStorage from "@react-native-async-storage/async-storage";
-import axios from "axios";
-import React, { createContext, useEffect, useState } from "react";
-import { BASE_URL, X_ACCESS_TOKEN } from "../config";
+import AsyncStorage from '@react-native-async-storage/async-storage'
+import axios from 'axios'
+import React, { createContext, useEffect, useState } from 'react'
+import { BASE_URL, X_ACCESS_TOKEN } from '../config'
 // import {NetworkInfo} from 'react-native-network-info';
-import publicIP from 'react-native-public-ip';
+import publicIP from 'react-native-public-ip'
 
-export const AuthContext = createContext();
+export const AuthContext = createContext()
 
 export const AuthProvider = ({ children }) => {
-  const [getIP, setIP] = useState();
+  const [getIP, setIP] = useState()
   publicIP()
-  .then(ip => {    
-    console.log(ip);
-    setIP(ip)
-    // '47.122.71.234'
-  })
-  .catch(error => {
-    console.log(error);
-    // 'Unable to get IP address.'
-  });
+    .then((ip) => {
+      console.log(ip)
+      setIP(ip)
+      // '47.122.71.234'
+    })
+    .catch((error) => {
+      console.log(error)
+      // 'Unable to get IP address.'
+    })
 
   // NetworkInfo.getIPAddress().then(ipAddress => {
   //   setIP(ipAddress)
   // });
   // console.log(getIP)
-  
-  const [userInfo, setUserInfo] = useState({});
-  const [isLoading, setIsLoading] = useState(false);
-  const [splashLoading, setSplashLoading] = useState(false);
-  const [surveyQuestion, setSurveyQuestion] = useState({});
-  const [trans_history, setTrans_history] = useState([]);
-  const [panelist_basic_details, setPanelist_basic_details] = useState(null);
-  const [is_subscribed, setIs_subscribed] = useState(true);
-  const [temp_password, setTemp_password] = useState("");
-  const [regCre, setRegCre] = useState(null);
+
+  const [userInfo, setUserInfo] = useState({})
+  const [isLoading, setIsLoading] = useState(false)
+  const [splashLoading, setSplashLoading] = useState(false)
+  const [surveyQuestion, setSurveyQuestion] = useState({})
+  const [trans_history, setTrans_history] = useState([])
+  const [panelist_basic_details, setPanelist_basic_details] = useState(null)
+  const [is_subscribed, setIs_subscribed] = useState(true)
+  const [temp_password, setTemp_password] = useState('')
+  const [regCre, setRegCre] = useState(null)
 
   const panelist_profiling_ans = (ans_key) => {
-    const data = JSON.stringify(ans_key);
-    console.log(ans_key);
+    const data = JSON.stringify(ans_key)
+    console.log(ans_key)
     axios
       .post(
         `${BASE_URL}/setProfilingAnswer/${parseInt(
@@ -46,32 +46,58 @@ export const AuthProvider = ({ children }) => {
         data,
         {
           Headers: {
-            "Content-Type": "application/json",
-            "x-access-token": X_ACCESS_TOKEN,
-            "Access-Control-Allow-Methods": "POST, PUT, GET, OPTIONS",
+            'Content-Type': 'application/json',
+            'x-access-token': X_ACCESS_TOKEN,
+            'Access-Control-Allow-Methods': 'POST, PUT, GET, OPTIONS',
           },
         }
       )
       .then((res) => {
-        let responce = res.data;
-        console.log(responce);
+        let responce = res.data
+        console.log(responce)
         panelistBasicDetails_func(parseInt(userInfo.Result.panelistID))
         // alert(res.data.message)
-        setIsLoading(false);
+        setIsLoading(false)
       })
       .catch((e) => {
-        console.log(`login error ${e}`);
-        alert(`error ${e}`);
-        setIsLoading(false);
-      });
-  };
+        console.log(`login error ${e}`)
+        alert(`error ${e}`)
+        setIsLoading(false)
+      })
+  }
 
+  const setUserInfoFun = async (id) => {
+    console.log('setting userinfo')
+    console.log(parseInt(id))
+    axios(`${BASE_URL}/getBasicProfiling/${parseInt(id)}`)
+      .then((res) => {
+        let userInfo = res.data
+        setPanelist_basic_details(res.data)
+        console.log(userInfo)
+        AsyncStorage.getItem('userInfo').then((userInfo1) => {
+          userInfo1 = JSON.parse(userInfo1)
+          console.log({ userInfo1 })
+          userInfo1.Result = userInfo.Results
+          setUserInfo(userInfo1)
+          AsyncStorage.setItem('userInfo', JSON.stringify(userInfo1))
+          console.log({ userInfo3: userInfo1 })
+          setIsLoading(false)
+        })
+      })
+      .catch((err) => {
+        console.log('error setting userinfo')
+        console.log(err)
+      })
+    AsyncStorage.getItem('userInfo').then((userInfo2) => {
+      console.log({ userInfo2 })
+    })
+  }
   const avatar_set = (avatar_name) => {
-    console.log(avatar_name);
+    console.log(avatar_name)
     const data = JSON.stringify({
       is_avatar: 1,
       avatar_name: avatar_name,
-    });
+    })
 
     axios
       .post(
@@ -79,51 +105,51 @@ export const AuthProvider = ({ children }) => {
         data,
         {
           Headers: {
-            "Content-Type": "application/json",
-            "x-access-token": X_ACCESS_TOKEN,
+            'Content-Type': 'application/json',
+            'x-access-token': X_ACCESS_TOKEN,
           },
         }
       )
       .then((res) => {
-        let userInfo = res.data;
-        console.log(userInfo);
-        alert(res.data.message);
-        setIsLoading(false);
+        let userInfo = res.data
+        console.log(userInfo)
+        alert(res.data.message)
+        setIsLoading(false)
       })
       .catch((e) => {
-        console.log(`login error ${e}`);
-        alert(`error ${e}`);
-        setIsLoading(false);
-      });
-  };
+        console.log(`login error ${e}`)
+        alert(`error ${e}`)
+        setIsLoading(false)
+      })
+  }
 
   const redeem_request = (redeem_points, redeem_mode) => {
     const data = JSON.stringify({
       panelistID: `${userInfo.Result.panelistID}`,
       redeem_points: `${redeem_points}`,
       redeem_mode: `${redeem_mode}`,
-    });
+    })
 
     axios
       .post(`${BASE_URL}/redeemRequest`, data, {
         Headers: {
-          "Content-Type": "application/json",
-          "x-access-token": "3b5Udae8brA5yuXA7C3ZCnWVvwFUXPRB",
-          "Access-Control-Allow-Methods": "POST, PUT, GET, OPTIONS",
+          'Content-Type': 'application/json',
+          'x-access-token': '3b5Udae8brA5yuXA7C3ZCnWVvwFUXPRB',
+          'Access-Control-Allow-Methods': 'POST, PUT, GET, OPTIONS',
         },
       })
       .then((res) => {
-        let userInfo = res.data;
-        console.log(userInfo);
-        alert(res.data.message);
-        setIsLoading(false);
+        let userInfo = res.data
+        console.log(userInfo)
+        alert(res.data.message)
+        setIsLoading(false)
       })
       .catch((e) => {
-        console.log(`login error ${e}`);
-        alert(`error ${e}`);
-        setIsLoading(false);
-      });
-  };
+        console.log(`login error ${e}`)
+        alert(`error ${e}`)
+        setIsLoading(false)
+      })
+  }
 
   const update_profile = (
     firstname,
@@ -140,18 +166,19 @@ export const AuthProvider = ({ children }) => {
     code,
     navigation
   ) => {
-    console.log(firstname);
-    console.log(lastname);
-    console.log(date);
-    console.log(gender);
-    console.log(add1);
-    console.log(add2);
-    console.log(city);
-    console.log(state);
-    console.log(country);
-    console.log(zip);
-    console.log(phone);
-    setIsLoading(true);
+    console.log(firstname)
+    console.log(lastname)
+    console.log(date)
+    console.log(gender)
+    console.log(add1)
+    console.log(add2)
+    console.log(city)
+    console.log(state)
+    console.log(country)
+    console.log(zip)
+    console.log(phone)
+    setIsLoading(true)
+    const id = panelist_basic_details.Results.panelistID
     const data = JSON.stringify({
       firstname: firstname,
       lastname: lastname,
@@ -164,9 +191,9 @@ export const AuthProvider = ({ children }) => {
       city: city,
       zipcode: zip,
       phone: phone,
-    });
-    console.log(data);
-    console.log(panelist_basic_details.Results.panelistID);
+    })
+    console.log(data)
+    console.log(panelist_basic_details.Results.panelistID)
     axios
       .post(
         `${BASE_URL}/setBasicProfiling/${parseInt(
@@ -175,44 +202,45 @@ export const AuthProvider = ({ children }) => {
         data,
         {
           Headers: {
-            "Content-Type": "application/json",
-            "x-access-token": X_ACCESS_TOKEN,
-            "Access-Control-Allow-Methods": "POST, PUT, GET, OPTIONS",
+            'Content-Type': 'application/json',
+            'x-access-token': X_ACCESS_TOKEN,
+            'Access-Control-Allow-Methods': 'POST, PUT, GET, OPTIONS',
           },
         }
       )
       .then((res) => {
-        let userInfo = res.data;
-        console.log(userInfo);
-        alert(res.data.message);
+        let userInfo = res.data
+        console.log(userInfo)
+        alert(res.data.message)
         if (code == 1) {
-          console.log(temp_password);
+          console.log(temp_password)
           login_after_update_profile(
             panelist_basic_details.Results.email,
             temp_password
-          );
-          navigation.navigate("User Profile Survey");
-          if (userInfo.message == "success") {
-            navigation.navigate("User Profile Survey");
+          )
+          navigation.navigate('User Profile Survey')
+          if (userInfo.message == 'success') {
+            navigation.navigate('User Profile Survey')
           }
         }
-        setIsLoading(false);
-        return res.date;
+        setUserInfoFun(id)
+        setIsLoading(false)
+        return res.date
       })
       .catch((e) => {
-        console.log(`Update Profile error ${e}`);
-        alert(`Update Profile error ${e}`);
-        setIsLoading(false);
-      });
-  };
+        console.log(`Update Profile error ${e}`)
+        alert(`Update Profile error ${e}`)
+        setIsLoading(false)
+      })
+  }
 
   const emailUnsubscribe = (
     unsubscribe_code,
     feedback_option_code,
     feedback_message
   ) => {
-    setIsLoading(true);
-    let data = "";
+    setIsLoading(true)
+    let data = ''
     feedback_option_code !== 6
       ? (data = JSON.stringify({
           unsubscribe_code: unsubscribe_code,
@@ -222,109 +250,109 @@ export const AuthProvider = ({ children }) => {
           unsubscribe_code: unsubscribe_code,
           feedback_option_code: feedback_option_code,
           feedback_message: feedback_message,
-        }));
-    console.log(data);
-    console.log(parseInt(userInfo.Result.panelistID));
+        }))
+    console.log(data)
+    console.log(parseInt(userInfo.Result.panelistID))
     axios
       .post(
         `${BASE_URL}/unsubscribes/${parseInt(userInfo.Result.panelistID)}`,
         data,
         {
           Headers: {
-            "Content-Type": "application/json",
-            "x-access-token": X_ACCESS_TOKEN,
+            'Content-Type': 'application/json',
+            'x-access-token': X_ACCESS_TOKEN,
           },
         }
       )
       .then((res) => {
-        let userInfo = res.data;
-        console.log(userInfo);
-        alert(res.data.message);
-        setIsLoading(false);
+        let userInfo = res.data
+        console.log(userInfo)
+        alert(res.data.message)
+        setIsLoading(false)
       })
       .catch((e) => {
-        console.log(`login error ${e}`);
-        setIsLoading(false);
-      });
-  };
+        console.log(`login error ${e}`)
+        setIsLoading(false)
+      })
+  }
 
   const emailSubscribe = () => {
-    setIsLoading(true);
+    setIsLoading(true)
     let data = JSON.stringify({
       unsubscribe_code: 1,
-    });
-    console.log(data);
-    console.log(parseInt(userInfo.Result.panelistID));
+    })
+    console.log(data)
+    console.log(parseInt(userInfo.Result.panelistID))
     axios
       .post(
         `${BASE_URL}/subscribes/${parseInt(userInfo.Result.panelistID)}`,
         data,
         {
           Headers: {
-            "Content-Type": "application/json",
-            "x-access-token": X_ACCESS_TOKEN,
+            'Content-Type': 'application/json',
+            'x-access-token': X_ACCESS_TOKEN,
           },
         }
       )
       .then((res) => {
-        let info = res.data;
-        console.log(info);
-        alert(res.data.message);
-        setIs_subscribed(true);
-        setIsLoading(false);
+        let info = res.data
+        console.log(info)
+        alert(res.data.message)
+        setIs_subscribed(true)
+        setIsLoading(false)
       })
       .catch((e) => {
-        console.log(`login error ${e}`);
-        setIsLoading(false);
-      });
-  };
+        console.log(`login error ${e}`)
+        setIsLoading(false)
+      })
+  }
 
   const changePassword = (curr_pass, new_pass, conf_new_pass) => {
-    setIsLoading(true);
+    setIsLoading(true)
     const data = JSON.stringify({
       current_passwrod: curr_pass,
       new_password: new_pass,
       confirm_new_password: conf_new_pass,
-    });
-    console.log(userInfo.Result.panelistID);
+    })
+    console.log(userInfo.Result.panelistID)
     axios
       .post(
         `${BASE_URL}/changePassword/${parseInt(userInfo.Result.panelistID)}`,
         data,
         {
           Headers: {
-            "x-access-token": "3b5Udae8brA5yuXA7C3ZCnWVvwFUXPRB",
+            'x-access-token': '3b5Udae8brA5yuXA7C3ZCnWVvwFUXPRB',
           },
         }
       )
       .then((res) => {
-        let userInfo = res.data;
-        console.log(userInfo);
-        alert(res.data.message);
-        setIsLoading(false);
+        let userInfo = res.data
+        console.log(userInfo)
+        alert(res.data.message)
+        setIsLoading(false)
       })
       .catch((e) => {
-        console.log(`login error ${e}`);
-        setIsLoading(false);
-      });
-  };
+        console.log(`login error ${e}`)
+        setIsLoading(false)
+      })
+  }
 
   const survey_question_func = () => {
-    setIsLoading(true);
+    setIsLoading(true)
     axios
       .get(`${BASE_URL}/getCountryQuestion/232/536`)
       .then((res) => {
-        let questions = res.data;
-        setSurveyQuestion(questions);
-        console.log(questions);
+        let questions = res.data
+        setSurveyQuestion(questions)
+        console.log(questions)
         // AsyncStorage.setItem('surveyQuestion', JSON.stringify(surveyQuestion));
-        setIsLoading(false);
+        setIsLoading(false)
       })
       .catch((e) => {
-        console.log(`register error ${e}`);
-        setIsLoading(false);
-      });
-  };
+        console.log(`register error ${e}`)
+        setIsLoading(false)
+      })
+  }
 
   const register = (
     email,
@@ -334,7 +362,7 @@ export const AuthProvider = ({ children }) => {
     lastName,
     navigation
   ) => {
-    setIsLoading(true);
+    setIsLoading(true)
 
     const data = JSON.stringify({
       email: email,
@@ -345,249 +373,248 @@ export const AuthProvider = ({ children }) => {
       firstName: firstName,
       lastName: lastName,
       isMobile: 1,
-    });
+    })
 
-    console.log(data);
+    console.log(data)
 
     axios
       .post(`${BASE_URL}/registration`, data)
       .then((res) => {
-        let userInfo = res.data;
-        setRegCre(userInfo);
-        AsyncStorage.setItem("userInfo", JSON.stringify(userInfo));
-        setIsLoading(false);
-        alert(userInfo.message);
-        if (userInfo.message == "failure") {
-          return false;
+        let userInfo = res.data
+        setRegCre(userInfo)
+        AsyncStorage.setItem('userInfo', JSON.stringify(userInfo))
+        setIsLoading(false)
+        alert(userInfo.message)
+        if (userInfo.message == 'failure' || userInfo.status == 'failure') {
+          return false
         } else {
-          navigation.navigate("Presonal Details Screen");
-          console.log(userInfo);
+          navigation.navigate('Personal Details Screen')
+          console.log(userInfo)
         }
-        return true;
+        return true
       })
       .catch((e) => {
-        console.log(`register error ${e}`);
-        setIsLoading(false);
-        alert(e);
-        return false;
-      });
-  };
+        console.log(`register error ${e}`)
+        setIsLoading(false)
+        alert(e)
+        return false
+      })
+  }
 
   const login_via_google = (email, displayPicture, isverified, userName) => {
-    setIsLoading(true);
+    setIsLoading(true)
     const data = JSON.stringify({
       email: email,
       displayPicture: displayPicture,
       isverified: isverified,
       registration_mode: 14,
       isMobile: 1,
-      ipaddress: "122.160.80.18",
+      ipaddress: '122.160.80.18',
       userName: userName,
-    });
-    console.log(data);
+    })
+    console.log(data)
     axios
       .post(`${BASE_URL}/googleapp`, data, {
         Headers: {
-          "Content-Type": "application/json",
-          "x-access-token": X_ACCESS_TOKEN,
+          'Content-Type': 'application/json',
+          'x-access-token': X_ACCESS_TOKEN,
         },
       })
       .then((res) => {
-        let userInfo = res.data;
-        console.log(userInfo);
-        setUserInfo(userInfo);
-        AsyncStorage.setItem("userInfo", JSON.stringify(userInfo));
-        setIsLoading(false);
+        let userInfo = res.data
+        console.log(userInfo)
+        setUserInfo(userInfo)
+        AsyncStorage.setItem('userInfo', JSON.stringify(userInfo))
+        setIsLoading(false)
       })
       .catch((e) => {
-        console.log(`login error ${e}`);
-        setIsLoading(false);
-      });
-  };
-
+        console.log(`login error ${e}`)
+        setIsLoading(false)
+      })
+  }
 
   const login_to_update_profile_question = (email) => {
-    setIsLoading(true);
-    if(temp_password != null){
-    const data = JSON.stringify({
-      email: email,
-      password: temp_password,
-    });
-    console.log(data);
-    axios
-      .post(`${BASE_URL}/login`, data, {
-        Headers: {
-          "Content-Type": "application/json",
-          "x-access-token": X_ACCESS_TOKEN,
-        },
+    setIsLoading(true)
+    if (temp_password != null) {
+      const data = JSON.stringify({
+        email: email,
+        password: temp_password,
       })
-      .then((res) => {
-        let userInfo = res.data;
-        console.log(userInfo);
-        setUserInfo(userInfo);
-        console.log("Hey I am a new User and I am logged In");
-        AsyncStorage.setItem("userInfo", JSON.stringify(userInfo));
-        setIsLoading(false);
-      })
-      .catch((e) => {
-        console.log(`login error ${e}`);
-        setIsLoading(false);
-      });
+      console.log(data)
+      axios
+        .post(`${BASE_URL}/login`, data, {
+          Headers: {
+            'Content-Type': 'application/json',
+            'x-access-token': X_ACCESS_TOKEN,
+          },
+        })
+        .then((res) => {
+          let userInfo = res.data
+          console.log(userInfo)
+          setUserInfo(userInfo)
+          console.log('Hey I am a new User and I am logged In')
+          AsyncStorage.setItem('userInfo', JSON.stringify(userInfo))
+          setIsLoading(false)
+        })
+        .catch((e) => {
+          console.log(`login error ${e}`)
+          setIsLoading(false)
+        })
     }
-  };
-  
+  }
 
   const login_after_update_profile = (email, password) => {
-    setIsLoading(true);
+    setIsLoading(true)
     const data = JSON.stringify({
       email: email,
       password: password,
-    });
+    })
     setTemp_password(password)
-    console.log(data);
+    console.log(data)
     axios
       .post(`${BASE_URL}/login`, data, {
         Headers: {
-          "Content-Type": "application/json",
-          "x-access-token": X_ACCESS_TOKEN,
+          'Content-Type': 'application/json',
+          'x-access-token': X_ACCESS_TOKEN,
         },
       })
       .then((res) => {
-        let userInfo = res.data;
-        console.log(userInfo);
-        setUserInfo(userInfo);
-        console.log("Hey I am a new User and I am logged In");
-        AsyncStorage.setItem("userInfo", JSON.stringify(userInfo));
-        setIsLoading(false);
+        let userInfo = res.data
+        console.log(userInfo)
+        setUserInfo(userInfo)
+        console.log('Hey I am a new User and I am logged In')
+        AsyncStorage.setItem('userInfo', JSON.stringify(userInfo))
+        setIsLoading(false)
       })
       .catch((e) => {
-        console.log(`login error ${e}`);
-        setIsLoading(false);
-      });
-  };
+        console.log(`login error ${e}`)
+        setIsLoading(false)
+      })
+  }
 
   const login = (email, password, navigation) => {
-    setIsLoading(true);
+    setIsLoading(true)
     const data = JSON.stringify({
       email: email,
       password: password,
-    });
-    console.log(data);
+    })
+    console.log(data)
     setTemp_password(password)
     axios
       .post(`${BASE_URL}/login`, data, {
         Headers: {
-          "Content-Type": "application/json",
-          "x-access-token": X_ACCESS_TOKEN,
+          'Content-Type': 'application/json',
+          'x-access-token': X_ACCESS_TOKEN,
         },
       })
       .then((res) => {
-        let userInfo = res.data;
-        console.log(userInfo);
-        setUserInfo(userInfo);
+        let userInfo = res.data
+        console.log(userInfo)
+        setUserInfo(userInfo)
         panelistBasicDetails_func(userInfo.Result.panelistID) // to update current profile percentage
-        AsyncStorage.setItem("userInfo", JSON.stringify(userInfo));
-        if (userInfo.status != "failure") {
-          navigation.navigate("Profile Survey");
+        AsyncStorage.setItem('userInfo', JSON.stringify(userInfo))
+        if (userInfo.status != 'failure') {
+          navigation.navigate('Profile Survey')
         } else {
-          alert("Wrong Credentials");
+          alert('Wrong Credentials')
         }
-        setIsLoading(false);
+        setIsLoading(false)
       })
       .catch((e) => {
-        console.log(`login error ${e}`);
-        alert("Wrong Credentials");
-        setIsLoading(false);
-      });
-  };
+        console.log(`login error ${e}`)
+        alert('Wrong Credentials')
+        setIsLoading(false)
+      })
+  }
 
   const logout = (email, navigation) => {
-    setIsLoading(true);
+    setIsLoading(true)
     const data = JSON.stringify({
       email: email,
-    });
+    })
     axios
       .post(`${BASE_URL}/logout`, data, {
         Headers: {
-          "Content-Type": "application/json",
-          "x-access-token": X_ACCESS_TOKEN,
+          'Content-Type': 'application/json',
+          'x-access-token': X_ACCESS_TOKEN,
         },
       })
       .then((res) => {
-        console.log(res.data);
-        AsyncStorage.removeItem("userInfo");
-        setUserInfo({});
-        navigation.navigate("Sign In Screen");
-        setIsLoading(false);
+        console.log(res.data)
+        AsyncStorage.removeItem('userInfo')
+        setUserInfo({})
+        navigation.navigate('Dashboard')
+        navigation.navigate('Sign In Screen')
+        setIsLoading(false)
       })
       .catch((e) => {
-        console.log(`logout error ${e}`);
-        setIsLoading(false);
-      });
-  };
+        console.log(`logout error ${e}`)
+        setIsLoading(false)
+      })
+  }
 
   const forgotpassword = (email) => {
-    setIsLoading(true);
+    setIsLoading(true)
     const data = JSON.stringify({
       email: email,
-    });
+    })
     axios
       .post(`${BASE_URL}/forgotpassword`, data, {
         Headers: {
-          "Content-Type": "application/json",
-          "x-access-token": X_ACCESS_TOKEN,
+          'Content-Type': 'application/json',
+          'x-access-token': X_ACCESS_TOKEN,
         },
       })
       .then((res) => {
-        console.log(res.data);
-        AsyncStorage.removeItem("userInfo");
-        setUserInfo({});
-        setIsLoading(false);
+        console.log(res.data)
+        AsyncStorage.removeItem('userInfo')
+        setUserInfo({})
+        setIsLoading(false)
       })
       .catch((e) => {
-        console.log(`logout error ${e}`);
-        setIsLoading(false);
-      });
-  };
+        console.log(`logout error ${e}`)
+        setIsLoading(false)
+      })
+  }
 
   const isLoggedIn = async () => {
     try {
-      setSplashLoading(true);
+      setSplashLoading(true)
 
-      let userInfo = await AsyncStorage.getItem("userInfo");
-      userInfo = JSON.parse(userInfo);
+      let userInfo = await AsyncStorage.getItem('userInfo')
+      userInfo = JSON.parse(userInfo)
       if (userInfo) {
-        setUserInfo(userInfo);
-        console.log(userInfo);
-        panelistBasicDetails_func(userInfo.Result.panelistID);
+        setUserInfo(userInfo)
+        console.log(userInfo)
+        panelistBasicDetails_func(userInfo.Result.panelistID)
       }
 
-      setSplashLoading(false);
+      setSplashLoading(false)
     } catch (e) {
-      setSplashLoading(false);
-      console.log(`is logged in error ${e}`);
+      setSplashLoading(false)
+      console.log(`is logged in error ${e}`)
     }
-  };
+  }
 
   const panelistBasicDetails_func = (panelistID) => {
-    setIsLoading(true);
+    setIsLoading(true)
     axios
       .get(`${BASE_URL}/getBasicProfiling/${parseInt(panelistID)}`)
       .then((res) => {
-        let details = res.data;
-        console.log(details);
-        setPanelist_basic_details(details);
-        setIsLoading(false);
+        let details = res.data
+        console.log(details)
+        setPanelist_basic_details(details)
+        setIsLoading(false)
       })
       .catch((e) => {
-        console.log(`register error ${e}`);
-        setIsLoading(false);
-      });
-  };
+        console.log(`register error ${e}`)
+        setIsLoading(false)
+      })
+  }
 
   useEffect(() => {
-    isLoggedIn();
-  }, []);
+    isLoggedIn()
+  }, [])
 
   return (
     <AuthContext.Provider
@@ -624,5 +651,5 @@ export const AuthProvider = ({ children }) => {
     >
       {children}
     </AuthContext.Provider>
-  );
-};
+  )
+}

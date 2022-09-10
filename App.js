@@ -1,13 +1,13 @@
 // import { StatusBar } from 'expo-status-bar';
-import React, {useContext} from 'react';
-import { Button, View, Text, StyleSheet, TouchableOpacity } from 'react-native';
-import { NavigationContainer } from '@react-navigation/native';
-import { createNativeStackNavigator } from '@react-navigation/native-stack';
+import React, { useContext } from 'react'
+import { Button, View, Text, StyleSheet, TouchableOpacity } from 'react-native'
+import { NavigationContainer } from '@react-navigation/native'
+import { createNativeStackNavigator } from '@react-navigation/native-stack'
 // import SignInScreen from './screen/SignInScreen';
 // import DefaultScreen from './screen/DefaultScreen';
 // import ForgotPasswordScreen from './screen/ForgotPasswordScreen';
 // import SignUpScreen from './screen/SignUpScreen';
-// import PresonalDetailsScreen from './screen/PresonalDetailsScreen';
+// import PersonalDetailsScreen from './screen/PersonalDetailsScreen';
 // import ProfileSurvey1 from './screen/ProfileSurvey1';
 // import ProfileSurvey2 from './screen/ProfileSurvey2';
 // import ProfileSurvey3 from './screen/ProfileSurvey3';
@@ -31,14 +31,14 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack';
 // import UserActivityScreen from './screen/UserActivitScreen';
 // import LoadingScreen from './screen/LoadingScreen';
 // import SpinnerEndPages from './screen/SpinnerEndPages';
-import Navigation from './component/Navigation';
+import Navigation from './component/Navigation'
 // import { AuthContext } from './context/AuthContext';
 // import SplashScreen from './screen/SplashScreen';
 
 // My Screen Tab
 // import MyTabScreen from './screen/MyTabScreen';
 
-import { AuthProvider } from './context/AuthContext';
+import { AuthProvider } from './context/AuthContext'
 // import DashboardScreen from './screen/DashboardScreen';
 // import SpinnerScreen from './screen/SpinnerScreen';
 // import RewardScreen from './screen/RewardScreen';
@@ -54,17 +54,17 @@ import { AuthProvider } from './context/AuthContext';
 // import DefaultScreen from './screen/DefaultScreen';
 // import SignUpScreen from './screen/SignUpScreen';
 // import ForgotPasswordScreen from './screen/ForgotPasswordScreen';
-import ProfileSurvey1 from './screen/ProfileSurvey1';
+import ProfileSurvey1 from './screen/ProfileSurvey1'
 // import ProfileSurvey2 from './screen/ProfileSurvey2';
 // import OnboardingScreen from './screen/OnBoardingScreen';
 // import LoadingScreen from './screen/LoadingScreen';
-import EndOfProfileSurveyScreen from './screen/EndOfProfileSurveyScreen';
-import ProfileSurvey3 from './screen/ProfileSurvey3';
+import EndOfProfileSurveyScreen from './screen/EndOfProfileSurveyScreen'
+import ProfileSurvey3 from './screen/ProfileSurvey3'
 //testing fonts
 // import fontTest from './screen/FontTest';
 
-const Stack = createNativeStackNavigator();
- 
+const Stack = createNativeStackNavigator()
+
 export default function App({ navigation }) {
   return (
     <AuthProvider>
@@ -72,9 +72,8 @@ export default function App({ navigation }) {
       {/* <SignInScreen></SignInScreen> */}
     </AuthProvider>
     // <Text>hi how are you i am fine</Text>
-  );
+  )
 }
-
 
 // export default function App({ navigation }) {
 //   // const {userInfo, splashLoading} = useContext(AuthContext);
