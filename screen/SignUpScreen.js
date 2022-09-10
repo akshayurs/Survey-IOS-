@@ -21,6 +21,7 @@ import {AuthContext} from '../context/AuthContext';
 import { useTheme } from 'react-native-paper';
 import TagLine from "../components/TagLine";
 import Logo from "../components/Logo";
+import KeyboardAvoidingWrapper from "../component/KeyboardAvoidingWrapper";
 var {width: SCREEN_WIDTH, height: SCREEN_HEIGHT,} = Dimensions.get('window');
 const scale = SCREEN_WIDTH / 320;
 console.log(SCREEN_HEIGHT)
@@ -69,6 +70,9 @@ export default function SignUpScreen({navigation}) {
     const {isLoading, register, setTemp_password} = useContext(AuthContext);
     console.log(isSelected)
     return (
+
+        <KeyboardAvoidingWrapper>
+
     <ScrollView showsVerticalScrollIndicator ={false}>
     <View style={styles.container}>
     <Animatable.View 
@@ -229,6 +233,10 @@ export default function SignUpScreen({navigation}) {
                     console.log(lastName)
                     console.log(lastName)
                     setTemp_password(password)
+                    if (confirmPassword != password) {
+                      alert('Confirm password is not same as entered password')
+                      return
+                    }
                     if(email != null && password != null && firstName != null && lastName != null && isSelected){
                         const responce = await register(email, password, confirmPassword, firstName, lastName, navigation)
                     }
@@ -261,6 +269,7 @@ export default function SignUpScreen({navigation}) {
         </Animatable.View>
     </View>
     </ScrollView>
+    </KeyboardAvoidingWrapper>
     );
 }
 
